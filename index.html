@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كوادر — نظام التوظيف والتقييم</title>
+<meta name="theme-color" content="#232852">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="كوادر">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest" id="mf">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{--acc:#3B4296;--acc2:#7B6CF0;--bg:#F5F6FB;--ink:#0F172A;--grey:#64748B;--line:#E2E8F0}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Tahoma,"Segoe UI",Arial,sans-serif}
+  main{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));text-align:center}
+  img.logo{width:104px;height:104px;border-radius:24px;box-shadow:0 12px 32px rgba(79,70,229,.28)}
+  h1{font-size:19px;margin:18px 0 6px}
+  p{margin:0;color:var(--grey);font-size:13.5px;line-height:1.9}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:20px;max-width:420px;width:100%;text-align:right}
+  .card b{display:block;margin-bottom:6px;font-size:14px}
+  ol{margin:6px 0 0;padding-inline-start:20px;font-size:13.5px;line-height:2}
+  .btn{display:inline-block;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;font-weight:bold;border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-family:inherit;cursor:pointer;text-decoration:none;margin-top:16px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);font-weight:normal}
+  .spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:s .8s linear infinite;margin:16px auto 0}
+  @keyframes s{to{transform:rotate(360deg)}}
+  [hidden]{display:none!important}
+  .sub{margin:-6px 0 8px;color:var(--grey);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="icon-512.png" alt="">
+  <h1>كوادر</h1>
+  <p class="sub">نظام التوظيف والتقييم</p>
+
+  <!-- فتح النظام (من الأيقونة أو بعد الحفظ) -->
+  <section id="go" hidden><p>جارٍ فتح النظام…</p><div class="spin"></div><a class="btn ghost" id="goNow" href="#">فتح الآن</a></section>
+
+  <!-- أول مرة: من زر «تطبيق الجوال» داخل النظام -->
+  <section id="setup" hidden>
+    <p>ثبّت النظام على جهازك ليفتح من أيقونته مباشرة.</p>
+    <button class="btn" id="installBtn" hidden>📲 تثبيت التطبيق</button>
+    <div class="card" id="ios" hidden><b>على الآيفون والآيباد (Safari)</b>
+      <ol><li>اضغط زر المشاركة <span aria-hidden="true">⬆︎</span> أسفل الشاشة</li><li>اختر «إضافة إلى الشاشة الرئيسية»</li><li>اضغط «إضافة»</li></ol></div>
+    <div class="card" id="android" hidden><b>على أندرويد (Chrome)</b>
+      <ol><li>اضغط القائمة ⋮ أعلى الشاشة</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»</li></ol></div>
+    <div class="card" id="desktop" hidden><b>على الكمبيوتر (Chrome أو Edge)</b>
+      <ol><li>اضغط رمز التثبيت في شريط العنوان، أو القائمة ⋮ ← «حفظ ومشاركة» ← «تثبيت الصفحة كتطبيق»</li><li>يظهر النظام في قائمة البرامج وعلى سطح المكتب</li></ol></div>
+    <a class="btn ghost" id="openNow" href="#">فتح النظام الآن</a>
+  </section>
+
+  <!-- بلا رابط محفوظ -->
+  <section id="none" hidden>
+    <p>افتح النظام من رابطك المعتاد، ثم اضغط «📲 تطبيق الجوال» داخله — يُحفظ رابطك هنا على هذا الجهاز فقط.</p>
+  </section>
+</main>
+<script>
+(function () {
+  /* الرابط يصل من النظام في الجزء بعد # (لا يُرسل لأي خادم) ويُحفظ على هذا الجهاز وحده.
+     على الآيفون تطبيق الشاشة الرئيسية له ذاكرة منفصلة عن Safari — فيبقى الرابط في عنوان الصفحة عند الإضافة ليصل إليه. */
+  /* الأمان: يُحفظ رابط النظام العام وحده — أي رمز شخصي (?p=…) يُحذف قبل الحفظ، وما حُفظ قديمًا يُنظَّف.
+     فالأيقونة تفتح صفحة الدخول نفسها (حساب العمل أو رقم الدخول) ولا يرى أحد إلا ما تسمح به صلاحيته */
+  var KEY = 'ev_system_link', ok = function (u) { return /^https:\/\/script\.google\.com\/(a\/macros\/[\w.\-]+|macros)\/s\/[\w\-]+\/exec$/.test(u); };   // رابط النظام وحده — لا تحويل لأي موقع آخر
+  var bare = function (u) { return String(u || '').split(/[?#]/)[0]; };
+  var link = '', m = /[#&]go=([^&]+)/.exec(location.hash || '');
+  if (m) { try { var g = bare(decodeURIComponent(m[1])); if (ok(g)) link = g; } catch (e) {} }
+  var saved = ''; try { saved = bare(localStorage.getItem(KEY) || ''); } catch (e) {}
+  if (link) { try { localStorage.setItem(KEY, link); } catch (e) {} } else if (ok(saved)) { link = saved; try { localStorage.setItem(KEY, saved); } catch (e) {} }
+  if (m && /%3F|\?/.test(m[1])) { try { history.replaceState(null, '', location.pathname + '#go=' + encodeURIComponent(link)); } catch (e) {} } // لا يبقى رمز في عنوان الصفحة
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  var ua = navigator.userAgent || '', ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document), android = /Android/.test(ua);
+  var $ = function (id) { return document.getElementById(id); };
+  if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
+  if (!link) { $('none').hidden = false; return; }
+  $('goNow').href = link; $('openNow').href = link;
+  // من الأيقونة (وضع التطبيق): افتح النظام مباشرة
+  if (standalone) { $('go').hidden = false; setTimeout(function () { location.replace(link); }, 150); return; }
+  // من المتصفح أول مرة: خطوات التثبيت لهذا الجهاز
+  $('setup').hidden = false;
+  if (ios) { $('ios').hidden = false; var mf = $('mf'); if (mf) mf.parentNode.removeChild(mf); }   // الآيفون يثبّت عنوان الصفحة نفسه (بالرابط)
+  else if (android) $('android').hidden = false; else $('desktop').hidden = false;
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; $('installBtn').hidden = false; });
+  $('installBtn').addEventListener('click', function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; $('installBtn').hidden = true; }); });
+  window.addEventListener('appinstalled', function () { $('installBtn').hidden = true; });
+})();
+</script>
+</body>
+</html>
